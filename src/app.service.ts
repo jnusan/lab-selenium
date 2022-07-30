@@ -6,8 +6,31 @@ import * as fs from 'fs';
 
 @Injectable()
 export class AppService {
+  private provinces = [];
+  private cantons = [];
+  private districts = [];
+  private readonly URL = 'https://www.bnventadebienes.com/';
   private readonly URL_TEST = `https://www.bnventadebienes.com/Home/HomeFilter?__RequestVerificationToken=EsS-8FNelVU-uYGOSkTtUOu-VZIsLJVJ__KUKmRNGqh0BAjoXPeH2aec5Ql0_BjdyRsQFeGLxLxfzkwo0FrlU4Myjk4uQcImf39B56htP-o1&ProvinceId=1&CantonId=19&DistrictId=105&PropertyTypeId=&MinPrice=&MaxPrice=&ExdebtorCode=&MinSize=&MaxSize=&PropertySaleTypeId=&PropertyStatusId=&MustBeForDevelopers=false&MustBeNegotiable=false&MustBeDiscounted=false&MustBeHighlighted=false&MustBeNovelty=false&MustBeInTheCoast=false`
+  private currentIndexProvince = 0;
+  private currentIndexCanton = 0;
+  private currentIndexDistrict = 0;
+  private finalData = {};
   private maxPrice = 0;
+  private minPrice = 0;
+
+  constructor(private selenium: SeleniumService) { }
+
+  private selectors = {
+    sltProvince: '//select[@id="ProvinceId"]',
+    sltCanton: '//select[@id="CantonId"]',
+    sltDistrict: '//select[@id="DistrictId"]',
+    btnGoFilter: '//div[@id="btn-search-by-address-1"]/button[@type="submit"]',
+    btnSearch: '//button[@type="submit"]',
+    pathData: '.properties-list',
+    minPrice: '//input[@name="MinPrice"]',
+    maxPrice: '//input[@name="MaxPrice"]'
+  }
+  private validationSearch = 'Lo sentimos, pero no hay propiedades';
   protected testRecipe = [
     'setupSelenium',
     'goToTest',
