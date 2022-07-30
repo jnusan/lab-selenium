@@ -47,6 +47,10 @@ export class AppService {
   ];
 
   protected searchDistrictProcessRecipe = [
+    'setCanton',
+    'getDistricts',
+    'search'
+  ];
   protected testRecipe = [
     'setupSelenium',
     'goToTest',
@@ -183,6 +187,45 @@ export class AppService {
       }
     } catch (error) {
       Logger.error(`Error on searchProcess:: ${error}`, 'ERROR');
+    }
+  }
+
+  protected async getCantons(): Promise<any> {
+    try {
+      const tempCantons = await this.selenium.driver.findElements(By.xpath(`${this.selectors.sltCanton}/option`));
+      for (const tempCanton of tempCantons) {
+        const name = await tempCanton.getText();
+        if (name !== 'Cantón') {
+          const rawCanton = {
+            value: await tempCanton.getAttribute('value'),
+            name,
+            selector: `${this.selectors.sltCanton}/option[@value="${await tempCanton.getAttribute('value')}"]`
+          }
+          this.cantons.push(rawCanton);
+        }
+      }
+      Logger.log('this.cantons', 'INFO');
+      Logger.log(JSON.stringify(this.cantons), 'INFO');
+      return true;
+    } catch (error) {
+      Logger.error(`Error on getCantons:: ${error}`, 'ERROR');
+    }
+  }
+
+  protected async setCanton(): Promise<any> {
+    try {
+      const currentCanton = this.cantons[this.currentIndexCanton];
+      await this.openSlt(this.selectors.sltCanton);
+      // await this.sleep();
+      await this.selenium.driver.findElement(By.xpath(currentCanton.selector)).click();
+      await this.sleep();
+      this.districts = [];
+      this.currentIndexDistrict = 0;
+      Logger.log('currentCanton', 'INFO');
+      Logger.log(JSON.stringify(currentCanton), 'INFO');
+      return true;
+    } catch (error) {
+      Logger.error(`Error on getProvinces:: ${error}`, 'ERROR');
     }
   }
 
