@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
+import { By, until } from 'selenium-webdriver';
+import { SeleniumService } from './selenium';
+import * as fs from 'fs';
 
 @Injectable()
 export class AppService {
