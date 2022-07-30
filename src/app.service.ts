@@ -99,6 +99,31 @@ export class AppService {
       Logger.error(`Error on setupSelenium:: ${error}`, 'ERROR');
     }
   }
+
+  protected async goTo(): Promise<any> {
+    try {
+      await this.selenium.driver.get(this.URL);
+      await this.selenium.driver.wait(
+        until.elementLocated(
+          By.xpath(this.selectors.sltProvince)
+        ),
+        20000
+      );
+      return true;
+    } catch (error) {
+      Logger.error(`Error on goTo:: ${error}`, 'ERROR');
+    }
+  }
+
+  protected async goToFilter(): Promise<any> {
+    try {
+      await this.selenium.driver.findElement(By.xpath(this.selectors.btnGoFilter)).click()
+      return true;
+    } catch (error) {
+      Logger.error(`Error on goToFilter:: ${error}`, 'ERROR');
+    }
+  }
+
   protected async getProperties() {
     try {
       const properties = await this.selenium.driver.findElements(By.xpath(`//div[@class="col-xs-12 col-md-8 properties-list"]/a`));
