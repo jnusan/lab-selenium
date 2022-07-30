@@ -317,6 +317,48 @@ export class AppService {
     }
   }
 
+  protected async getInfo() {
+    try {
+      await this.selenium.driver.findElement(By.xpath(this.selectors.btnSearch)).click();
+      // await this.sleep();
+      const pageSource = await this.selenium.driver.getPageSource();
+      const provinceName = this.provinces[this.currentIndexProvince]['name'];
+      const cantonName = this.cantons[this.currentIndexCanton]['name'];
+      const districtName = this.districts[this.currentIndexDistrict]['name'];
+      // console.log('this.currentIndexProvince', this.currentIndexProvince);
+      // console.log('this.currentIndexCanton', this.currentIndexCanton);
+      // console.log('this.currentIndexDistrict',this.currentIndexDistrict);
+      // if (!pageSource.includes(this.validationSearch)) {
+        // this.finalData = {
+        //   ...this.finalData,
+        //   [provinceName]: {
+        //     [cantonName]: {
+        //       [districtName]: await this.getProperties()
+        //     }
+        //   }
+        // }
+        const properties = await this.getProperties();
+        if(properties.length > 0) {
+          Logger.log('properties', 'INFO');
+          Logger.log(JSON.stringify(properties), 'INFO');
+          const headers = [`Provincia - ${provinceName} \n`, `Cantón - ${cantonName}  \n`, `Distrito - ${districtName} \n`].join('');
+          let body = '';
+          for (const property of properties) {
+            const currentProperty = [`Nombre: ${property.name} | `, `Precio: ${property.price} | `, `URL: ${property.url}`].join('');
+            body += `${currentProperty} \n`;
+          }
+          fs.writeFileSync('./data-properties.txt', `${headers}${body} \n`, { flag: 'a+' });
+        }
+      // }
+      // console.log(`provinceName::${JSON.stringify(provinceName)}`)
+      // console.log(`cantonName::${JSON.stringify(cantonName)}`)
+      // console.log(`districtName::${JSON.stringify(districtName)}`)
+      return true;
+    } catch (error) {
+      Logger.error(`Error on getInfo:: ${error}`, 'ERROR');
+    }
+  }
+
   protected async getProperties() {
     try {
       const properties = await this.selenium.driver.findElements(By.xpath(`//div[@class="col-xs-12 col-md-8 properties-list"]/a`));
