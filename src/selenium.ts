@@ -14,7 +14,7 @@ export class SeleniumService {
       };
       const firefoxOptions = new firefox.Options();
       firefoxOptions.setAcceptInsecureCerts(true);
-      if (!process.env.HEADLESS) {
+      if (!!Number(process.env.HEADLESS)) {
         firefoxOptions.headless().windowSize(screen);
       }
       firefoxOptions
