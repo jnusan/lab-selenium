@@ -312,4 +312,22 @@ export class AppService {
       Logger.error(`Error on getProperties:: ${error}`, 'ERROR');
     }
   }
+
+  protected async sleep() {
+    await new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(true);
+      }, 2500)
+    })
+  }
+
+  protected async openSlt(slt) {
+    try {
+      await this.selenium.driver.findElement(By.xpath(slt)).click();
+      return true;
+    } catch (error) {
+      Logger.error(`Error on openSlt:: ${error}`, 'ERROR');
+    }
+  }
+
 }
