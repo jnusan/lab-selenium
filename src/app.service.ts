@@ -31,11 +31,45 @@ export class AppService {
     maxPrice: '//input[@name="MaxPrice"]'
   }
   private validationSearch = 'Lo sentimos, pero no hay propiedades';
+
+  protected setupRecipe = ['setupSelenium'];
+  protected shopRecipe = [
+    'goTo',
+    'goToFilter',
+    'getProvinces',
+    'searchProvinceProcess'
+  ];
+
   protected testRecipe = [
     'setupSelenium',
     'goToTest',
     'getProperties'
   ]
+
+  public async initProcess(price) {
+    try {
+      this.maxPrice = price;
+      await this.setupTargetIterator();
+      for (const theFunction of this.shopRecipe) {
+        Logger.log(`initProcess:: Executing ${theFunction}`)
+        await this[theFunction]();
+      }
+    } catch (error) {
+      Logger.error(`Error on initProcess:: ${error}`, 'ERROR');
+    }
+  }
+
+  protected async setupTargetIterator() {
+    try {
+      for (const theFunction of this.setupRecipe) {
+        Logger.log(`setupTargetIterator:: Executing ${theFunction}`)
+        await this[theFunction]();
+      }
+    } catch (error) {
+      Logger.error(`Error on setupTargetIterator:: ${error}`, 'ERROR');
+    }
+  }
+
   public async setupTest(price) {
     try {
       this.maxPrice = price;
