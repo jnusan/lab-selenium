@@ -51,6 +51,13 @@ export class AppService {
     'getDistricts',
     'search'
   ];
+
+  protected searchProcessRecipe = [
+    'setDistrict',
+    'setPrice',
+    'getInfo',
+  ];
+
   protected testRecipe = [
     'setupSelenium',
     'goToTest',
@@ -223,6 +230,58 @@ export class AppService {
       this.currentIndexDistrict = 0;
       Logger.log('currentCanton', 'INFO');
       Logger.log(JSON.stringify(currentCanton), 'INFO');
+      return true;
+    } catch (error) {
+      Logger.error(`Error on getProvinces:: ${error}`, 'ERROR');
+    }
+  }
+
+  protected async searchDistrictProcess(): Promise<any> {
+    try {
+      while (this.cantons[this.currentIndexCanton]) {
+        for (const theFunction of this.searchDistrictProcessRecipe) {
+          Logger.log(`searchDistrictProcess:: Executing ${theFunction}`);
+          await this[theFunction]();
+          await this.sleep();
+        }
+        this.currentIndexCanton++;
+      }
+    } catch (error) {
+      Logger.error(`Error on searchDistrictProcess:: ${error}`, 'ERROR');
+    }
+  }
+
+  protected async getDistricts(): Promise<any> {
+    try {
+      const tempDistricts = await this.selenium.driver.findElements(By.xpath(`${this.selectors.sltDistrict}/option`));
+      for (const tempDistrict of tempDistricts) {
+        const name = await tempDistrict.getText();
+        if (name !== 'Distrito') {
+          const rawDistrict = {
+            value: await tempDistrict.getAttribute('value'),
+            name,
+            selector: `${this.selectors.sltDistrict}/option[@value="${await tempDistrict.getAttribute('value')}"]`
+          }
+          this.districts.push(rawDistrict);
+        }
+      }
+      Logger.log('this.districts', 'INFO');
+      Logger.log(JSON.stringify(this.districts), 'INFO');
+      return true;
+    } catch (error) {
+      Logger.error(`Error on getDistricts:: ${error}`, 'ERROR');
+    }
+  }
+
+  protected async setDistrict(): Promise<any> {
+    try {
+      const currentDistrict = this.districts[this.currentIndexDistrict];
+      await this.openSlt(this.selectors.sltDistrict);
+      await this.selenium.driver.findElement(By.xpath(currentDistrict.selector)).click();
+      await this.sleep();
+      Logger.log('currentDistrict', 'INFO');
+      Logger.log(JSON.stringify(currentDistrict), 'INFO');
+      // this.currentIndexDistrict++;
       return true;
     } catch (error) {
       Logger.error(`Error on getProvinces:: ${error}`, 'ERROR');
