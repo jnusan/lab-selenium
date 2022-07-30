@@ -168,14 +168,12 @@ export class AppService {
     try {
       const currentProvince = this.provinces[this.currentIndexProvince];
       await this.openSlt(this.selectors.sltProvince);
-      // await this.sleep();
       await this.selenium.driver.findElement(By.xpath(currentProvince.selector)).click();
       await this.sleep();
       this.cantons = [];
       this.currentIndexCanton = 0;
       Logger.log('currentProvince', 'INFO');
       Logger.log(JSON.stringify(currentProvince), 'INFO');
-      // this.currentIndexProvince++;
       return true;
     } catch (error) {
       Logger.error(`Error on getProvinces:: ${error}`, 'ERROR');
@@ -223,7 +221,6 @@ export class AppService {
     try {
       const currentCanton = this.cantons[this.currentIndexCanton];
       await this.openSlt(this.selectors.sltCanton);
-      // await this.sleep();
       await this.selenium.driver.findElement(By.xpath(currentCanton.selector)).click();
       await this.sleep();
       this.districts = [];
@@ -281,7 +278,6 @@ export class AppService {
       await this.sleep();
       Logger.log('currentDistrict', 'INFO');
       Logger.log(JSON.stringify(currentDistrict), 'INFO');
-      // this.currentIndexDistrict++;
       return true;
     } catch (error) {
       Logger.error(`Error on getProvinces:: ${error}`, 'ERROR');
@@ -320,23 +316,9 @@ export class AppService {
   protected async getInfo() {
     try {
       await this.selenium.driver.findElement(By.xpath(this.selectors.btnSearch)).click();
-      // await this.sleep();
-      const pageSource = await this.selenium.driver.getPageSource();
       const provinceName = this.provinces[this.currentIndexProvince]['name'];
       const cantonName = this.cantons[this.currentIndexCanton]['name'];
       const districtName = this.districts[this.currentIndexDistrict]['name'];
-      // console.log('this.currentIndexProvince', this.currentIndexProvince);
-      // console.log('this.currentIndexCanton', this.currentIndexCanton);
-      // console.log('this.currentIndexDistrict',this.currentIndexDistrict);
-      // if (!pageSource.includes(this.validationSearch)) {
-        // this.finalData = {
-        //   ...this.finalData,
-        //   [provinceName]: {
-        //     [cantonName]: {
-        //       [districtName]: await this.getProperties()
-        //     }
-        //   }
-        // }
         const properties = await this.getProperties();
         if(properties.length > 0) {
           Logger.log('properties', 'INFO');
@@ -349,10 +331,6 @@ export class AppService {
           }
           fs.writeFileSync('./data-properties.txt', `${headers}${body} \n`, { flag: 'a+' });
         }
-      // }
-      // console.log(`provinceName::${JSON.stringify(provinceName)}`)
-      // console.log(`cantonName::${JSON.stringify(cantonName)}`)
-      // console.log(`districtName::${JSON.stringify(districtName)}`)
       return true;
     } catch (error) {
       Logger.error(`Error on getInfo:: ${error}`, 'ERROR');
@@ -364,11 +342,6 @@ export class AppService {
       const properties = await this.selenium.driver.findElements(By.xpath(`//div[@class="col-xs-12 col-md-8 properties-list"]/a`));
       const propertiesInfo = [];
       for (const property of properties) {
-      // for (let i = 0; i < properties.length; i++) {
-      //   const property = properties[i];
-        // let nameElement = await property.findElement(By.xpath('*//div[@class="property-item-title"]'));
-        // let nameText = await nameElement.getText();
-        // console.log('name::', nameText);
         let currentProperty = {
           name: await property.findElement(By.xpath('*//div[@class="property-item-title"]')).getText(),
           price: (await property.findElement(By.xpath('*//div[@class="property-price"]')).getText()).split(':')[1].replace(/ /gi, ''),
