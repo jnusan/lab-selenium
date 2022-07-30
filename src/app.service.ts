@@ -288,6 +288,35 @@ export class AppService {
     }
   }
 
+  protected async search(): Promise<any> {
+    try {
+      while (this.districts[this.currentIndexDistrict]) {
+        for (const theFunction of this.searchProcessRecipe) {
+          Logger.log(`search:: Executing ${theFunction}`);
+          await this[theFunction]();
+          await this.sleep();
+        }
+        this.currentIndexDistrict++;
+      }
+    } catch (error) {
+      Logger.error(`Error on search:: ${error}`, 'ERROR');
+    }
+  }
+
+  protected async setPrice() {
+    try {
+      const minPrice = await this.selenium.driver.findElement(By.xpath(this.selectors.minPrice));
+      const maxPrice = await this.selenium.driver.findElement(By.xpath(this.selectors.maxPrice));
+      await minPrice.clear();
+      await minPrice.sendKeys(this.minPrice);
+      await maxPrice.clear();
+      await maxPrice.sendKeys(this.maxPrice);
+      return true;
+    } catch (error) {
+      Logger.error(`Error on getInfo:: ${error}`, 'ERROR');
+    }
+  }
+
   protected async getProperties() {
     try {
       const properties = await this.selenium.driver.findElements(By.xpath(`//div[@class="col-xs-12 col-md-8 properties-list"]/a`));
