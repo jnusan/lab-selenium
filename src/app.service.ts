@@ -348,9 +348,9 @@ export class AppService {
           url: await property.getAttribute('href')
         }
         propertiesInfo.push(currentProperty);
+        Logger.log('properties', 'INFO');
+        Logger.log(JSON.stringify(propertiesInfo));
       }
-      Logger.log('properties', 'INFO');
-      Logger.log(JSON.stringify(propertiesInfo));
       return propertiesInfo;
     } catch (error) {
       Logger.error(`Error on getProperties:: ${error}`, 'ERROR');
