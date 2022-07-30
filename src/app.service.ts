@@ -40,6 +40,13 @@ export class AppService {
     'searchProvinceProcess'
   ];
 
+  protected searchProvinceProcessRecipe = [
+    'setProvince',
+    'getCantons',
+    'searchDistrictProcess'
+  ];
+
+  protected searchDistrictProcessRecipe = [
   protected testRecipe = [
     'setupSelenium',
     'goToTest',
@@ -121,6 +128,61 @@ export class AppService {
       return true;
     } catch (error) {
       Logger.error(`Error on goToFilter:: ${error}`, 'ERROR');
+    }
+  }
+
+  protected async getProvinces(): Promise<any> {
+    try {
+      const tempProvinces = await this.selenium.driver.findElements(By.xpath(`${this.selectors.sltProvince}/option`));
+      for (const tempProvince of tempProvinces) {
+        const name = await tempProvince.getText();
+        if (name !== 'Provincia') {
+          const rawProvince = {
+            value: await tempProvince.getAttribute('value'),
+            name,
+            selector: `${this.selectors.sltProvince}/option[@value="${await tempProvince.getAttribute('value')}"]`
+          }
+          this.provinces.push(rawProvince);
+        }
+      }
+      Logger.log('this.provinces', 'INFO');
+      Logger.log(JSON.stringify(this.provinces), 'INFO');
+      return true;
+    } catch (error) {
+      Logger.error(`Error on getProvinces:: ${error}`, 'ERROR');
+    }
+  }
+
+  protected async setProvince(): Promise<any> {
+    try {
+      const currentProvince = this.provinces[this.currentIndexProvince];
+      await this.openSlt(this.selectors.sltProvince);
+      // await this.sleep();
+      await this.selenium.driver.findElement(By.xpath(currentProvince.selector)).click();
+      await this.sleep();
+      this.cantons = [];
+      this.currentIndexCanton = 0;
+      Logger.log('currentProvince', 'INFO');
+      Logger.log(JSON.stringify(currentProvince), 'INFO');
+      // this.currentIndexProvince++;
+      return true;
+    } catch (error) {
+      Logger.error(`Error on getProvinces:: ${error}`, 'ERROR');
+    }
+  }
+
+  protected async searchProvinceProcess(): Promise<any> {
+    try {
+      while (this.provinces[this.currentIndexProvince]) {
+        for (const theFunction of this.searchProvinceProcessRecipe) {
+          Logger.log(`searchProvinceProcess:: Executing ${theFunction}`)
+          await this[theFunction]();
+          await this.sleep();
+        }
+        this.currentIndexProvince++;
+      }
+    } catch (error) {
+      Logger.error(`Error on searchProcess:: ${error}`, 'ERROR');
     }
   }
 
